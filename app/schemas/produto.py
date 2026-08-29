@@ -9,6 +9,14 @@ class ProdutoCreate(BaseModel):
     cor: str | None = None
 
 
+class ProdutoUpdate(BaseModel):
+    nome: str | None = Field(default=None, min_length=1, max_length=150)
+    preco: float | None = Field(default=None, gt=0)
+    estoque: int | None = Field(default=None, ge=0)
+    tamanho: str | None = None
+    cor: str | None = None
+
+
 class ProdutoResponse(BaseModel):
     id: int
     nome: str
