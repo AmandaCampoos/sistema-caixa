@@ -3,7 +3,10 @@ from sqlalchemy import text
 
 from app.core.database import Base, engine
 from app.models.produto import Produto
+from app.api.venda import router as vendas_router
 from app.api.produtos import router as produtos_router
+from app.models.venda import Venda, ItemVenda
+
 
 
 app = FastAPI(
@@ -16,7 +19,7 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 app.include_router(produtos_router)
-
+app.include_router(vendas_router)
 
 @app.get("/")
 def inicio():
