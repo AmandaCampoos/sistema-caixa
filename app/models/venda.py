@@ -4,6 +4,7 @@ from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.models.produto import Produto
 
 
 class Venda(Base):
@@ -64,9 +65,11 @@ class ItemVenda(Base):
     )
 
     produto_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("produtos.id"),
         nullable=False
     )
+
+    produto: Mapped["Produto"] = relationship()
 
     quantidade: Mapped[int] = mapped_column(
         Integer,
