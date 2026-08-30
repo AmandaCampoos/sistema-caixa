@@ -1,0 +1,353 @@
+/* ================================
+   CONFIGURAÇÕES GERAIS
+================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+}
+
+
+/* ================================
+   CABEÇALHO
+================================ */
+
+.topbar {
+    background: #111827;
+    color: white;
+
+    padding: 20px 40px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h1 {
+    font-size: 24px;
+}
+
+.topbar p {
+    margin-top: 5px;
+    color: #9ca3af;
+}
+
+
+/* Indicador de sistema online */
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 14px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+
+    background: #22c55e;
+
+    border-radius: 50%;
+}
+
+
+/* ================================
+   CONTEÚDO PRINCIPAL
+================================ */
+
+.container {
+    max-width: 1400px;
+
+    margin: 30px auto;
+
+    padding: 0 20px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 380px;
+
+    gap: 25px;
+}
+
+
+/* ================================
+   PRODUTOS
+================================ */
+
+.products-section {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.section-header h2 {
+    margin-bottom: 5px;
+}
+
+.section-header p {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* Campo de busca */
+
+#busca {
+    width: 250px;
+
+    padding: 12px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    outline: none;
+}
+
+#busca:focus {
+    border-color: #2563eb;
+}
+
+
+/* Grid dos produtos */
+
+.products-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+
+/* Card do produto */
+
+.product-card {
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    transition: 0.2s;
+
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.product-name {
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+.product-price {
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+.product-stock {
+    font-size: 13px;
+
+    color: #6b7280;
+}
+
+
+/* ================================
+   CARRINHO
+================================ */
+
+.cart {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+    height: fit-content;
+}
+
+.cart-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.cart-header span {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* Itens */
+
+.cart-items {
+    min-height: 150px;
+}
+
+.empty-cart {
+    text-align: center;
+
+    color: #9ca3af;
+
+    padding: 40px 10px;
+}
+
+
+/* ================================
+   RESUMO
+================================ */
+
+.cart-summary {
+    border-top: 1px solid #e5e7eb;
+
+    margin-top: 20px;
+
+    padding-top: 20px;
+}
+
+.summary-line {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.summary-line.total {
+    font-size: 20px;
+}
+
+
+/* ================================
+   PAGAMENTO
+================================ */
+
+.payment {
+    margin-top: 20px;
+}
+
+.payment label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+}
+
+.payment select {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+}
+
+
+/* ================================
+   BOTÃO
+================================ */
+
+.btn-finalizar {
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.btn-finalizar:hover {
+    background: #1d4ed8;
+}
+
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+
+@media (max-width: 900px) {
+
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .topbar {
+        padding: 20px;
+    }
+
+    .section-header {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 15px;
+    }
+
+    #busca {
+        width: 100%;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+}

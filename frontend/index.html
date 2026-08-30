@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Faz o sistema se adaptar a telas menores -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sistema Caixa</title>
+
+    <!-- Nosso arquivo de estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Cabeçalho principal do sistema -->
+    <header class="topbar">
+        <div>
+            <h1>Sistema Caixa</h1>
+            <p>Controle de vendas e estoque</p>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Sistema online
+        </div>
+    </header>
+
+
+    <!-- Conteúdo principal -->
+    <main class="container">
+
+        <!-- Área de produtos -->
+        <section class="products-section">
+
+            <div class="section-header">
+                <div>
+                    <h2>Produtos</h2>
+                    <p>Selecione um produto para adicionar à venda.</p>
+                </div>
+
+                <!-- Campo que futuramente vamos usar para pesquisar -->
+                <input
+                    type="text"
+                    id="busca"
+                    placeholder="Buscar produto..."
+                >
+            </div>
+
+            <!-- JavaScript vai colocar os produtos aqui -->
+            <div id="lista-produtos" class="products-grid">
+                
+                <p class="loading">
+                    Carregando produtos...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Carrinho -->
+        <aside class="cart">
+
+            <div class="cart-header">
+                <h2>Venda atual</h2>
+                <span id="quantidade-itens">0 itens</span>
+            </div>
+
+
+            <!-- Produtos adicionados ao carrinho -->
+            <div id="carrinho" class="cart-items">
+
+                <p class="empty-cart">
+                    Nenhum produto adicionado.
+                </p>
+
+            </div>
+
+
+            <!-- Resumo da venda -->
+            <div class="cart-summary">
+
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <strong id="subtotal">R$ 0,00</strong>
+                </div>
+
+                <div class="summary-line total">
+                    <span>Total</span>
+                    <strong id="total">R$ 0,00</strong>
+                </div>
+
+            </div>
+
+
+            <!-- Forma de pagamento -->
+            <div class="payment">
+
+                <label for="forma-pagamento">
+                    Forma de pagamento
+                </label>
+
+                <select id="forma-pagamento">
+
+                    <option value="pix">
+                        PIX
+                    </option>
+
+                    <option value="dinheiro">
+                        Dinheiro
+                    </option>
+
+                    <option value="cartao">
+                        Cartão
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Botão para finalizar -->
+            <button
+                id="finalizar-venda"
+                class="btn-finalizar"
+            >
+                Finalizar venda
+            </button>
+
+        </aside>
+
+    </main>
+
+
+    <!-- Nosso JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>

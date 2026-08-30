@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from sqlalchemy import text
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine
 from app.models.produto import Produto
@@ -14,7 +15,18 @@ app = FastAPI(
     description="Sistema de gerenciamento de vendas e estoque",
     version="0.1.0"
 )
-
+# Permite que o frontend faça requisições para nossa API.
+#
+# Durante o desenvolvimento estamos permitindo qualquer origem.
+# Quando colocarmos o sistema em produção, vamos restringir
+# isso para o domínio real do nosso sistema.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Base.metadata.create_all(bind=engine)
 
