@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
-from app.models.produto import Produto
-from app.models.venda import Venda, ItemVenda
+from app.models.venda import Venda
 from app.schemas.venda import VendaCreate
+from app.services.venda_service import criar_venda
 
 
 router = APIRouter(
@@ -14,6 +14,13 @@ router = APIRouter(
 
 
 def get_db():
+    """
+    Cria uma sessão com o banco de dados para cada requisição.
+
+    O 'yield' entrega a sessão para a função da API.
+    O 'finally' garante que a conexão seja fechada
+    depois que a requisição terminar.
+    """
     db = SessionLocal()
 
     try:
@@ -23,83 +30,62 @@ def get_db():
 
 
 @router.post("/")
-def criar_venda(
+def criar_venda_api(
     dados: VendaCreate,
     db: Session = Depends(get_db)
 ):
-    total = 0
-    itens_venda = []
+    """
+    Endpoint responsável por receber uma nova venda.
 
-    for item in dados.itens:
+    A API não contém mais as regras de negócio.
+    Ela apenas recebe os dados e chama o service.
+    """
 
-        produto = db.query(Produto).filter(
-            Produto.id == item.produto_id,
-            Produto.ativo == True
-        ).first()
+    try:
+        # O service concentra toda a lógica da venda.
+        venda = criar_venda(db, dados)
 
-        if not produto:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Produto {item.produto_id} não encontrado"
-            )
+        return {
+            "id": venda.id,
+            "total": venda.total,
+            "forma_pagamento": venda.forma_pagamento,
+            "status": venda.status
+        }
 
-        if produto.estoque < item.quantidade:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Estoque insuficiente para o produto {produto.nome}"
-            )
-
-        subtotal = produto.preco * item.quantidade
-        total += subtotal
-
-        produto.estoque -= item.quantidade
-
-        novo_item = ItemVenda(
-            produto_id=produto.id,
-            quantidade=item.quantidade,
-            preco_unitario=produto.preco,
-            subtotal=subtotal
+    except ValueError as erro:
+        # Erros de regra de negócio, como:
+        # produto inexistente ou estoque insuficiente.
+        #
+        # Transformamos o ValueError em uma resposta
+        # HTTP compreensível para quem está consumindo a API.
+        raise HTTPException(
+            status_code=400,
+            detail=str(erro)
         )
 
-        itens_venda.append(novo_item)
-
-    nova_venda = Venda(
-        total=total,
-        desconto=0,
-        forma_pagamento=dados.forma_pagamento,
-        status="finalizada"
-    )
-
-    db.add(nova_venda)
-    db.flush()
-
-    for item in itens_venda:
-        item.venda_id = nova_venda.id
-        db.add(item)
-
-    db.commit()
-    db.refresh(nova_venda)
-
-    return {
-        "id": nova_venda.id,
-        "total": nova_venda.total,
-        "forma_pagamento": nova_venda.forma_pagamento,
-        "status": nova_venda.status
-    }
 
 @router.get("/")
 def listar_vendas(
     db: Session = Depends(get_db)
 ):
+    """
+    Retorna todas as vendas cadastradas.
+    """
+
     vendas = db.query(Venda).all()
 
     return vendas
+
 
 @router.get("/{venda_id}")
 def buscar_venda(
     venda_id: int,
     db: Session = Depends(get_db)
 ):
+    """
+    Busca uma venda específica pelo ID.
+    """
+
     venda = db.query(Venda).filter(
         Venda.id == venda_id
     ).first()
@@ -116,6 +102,9 @@ def buscar_venda(
         "desconto": venda.desconto,
         "forma_pagamento": venda.forma_pagamento,
         "status": venda.status,
+
+        # Aqui usamos o relacionamento que criamos
+        # no modelo Venda para acessar seus itens.
         "itens": [
             {
                 "produto_id": item.produto_id,
