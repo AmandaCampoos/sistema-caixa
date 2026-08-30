@@ -86,3 +86,43 @@ def criar_venda(
         "forma_pagamento": nova_venda.forma_pagamento,
         "status": nova_venda.status
     }
+
+@router.get("/")
+def listar_vendas(
+    db: Session = Depends(get_db)
+):
+    vendas = db.query(Venda).all()
+
+    return vendas
+
+@router.get("/{venda_id}")
+def buscar_venda(
+    venda_id: int,
+    db: Session = Depends(get_db)
+):
+    venda = db.query(Venda).filter(
+        Venda.id == venda_id
+    ).first()
+
+    if not venda:
+        raise HTTPException(
+            status_code=404,
+            detail="Venda não encontrada"
+        )
+
+    return {
+        "id": venda.id,
+        "total": venda.total,
+        "desconto": venda.desconto,
+        "forma_pagamento": venda.forma_pagamento,
+        "status": venda.status,
+        "itens": [
+            {
+                "produto_id": item.produto_id,
+                "quantidade": item.quantidade,
+                "preco_unitario": item.preco_unitario,
+                "subtotal": item.subtotal
+            }
+            for item in venda.itens
+        ]
+    }

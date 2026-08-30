@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
@@ -44,6 +44,11 @@ class Venda(Base):
         nullable=False
     )
 
+    itens: Mapped[list["ItemVenda"]] = relationship(
+        back_populates="venda"
+    )
+
+
 class ItemVenda(Base):
     __tablename__ = "itens_venda"
 
@@ -54,7 +59,7 @@ class ItemVenda(Base):
     )
 
     venda_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("vendas.id"),
         nullable=False
     )
 
@@ -76,4 +81,8 @@ class ItemVenda(Base):
     subtotal: Mapped[float] = mapped_column(
         Float,
         nullable=False
+    )
+
+    venda: Mapped["Venda"] = relationship(
+        back_populates="itens"
     )
