@@ -2,13 +2,13 @@
 // CONFIGURAÇÕES
 // ============================================================
 
-// URL base da nossa API.
+// URL base da nossa API FastAPI.
 const API_URL = "http://127.0.0.1:8000";
 
-// Lista de produtos recebidos da API.
+// Aqui vamos guardar todos os produtos vindos da API.
 let produtos = [];
 
-// Produtos adicionados à venda atual.
+// Aqui ficam somente os produtos da venda atual.
 let carrinho = [];
 
 
@@ -20,29 +20,32 @@ async function carregarProdutos() {
 
     try {
 
-        // Busca os produtos no backend.
+        // Faz uma requisição GET para buscar os produtos.
         const resposta = await fetch(
             `${API_URL}/produtos/`
         );
 
-        // Verifica se a API respondeu com erro.
+        // Se a API retornar algum erro, interrompemos a execução.
         if (!resposta.ok) {
             throw new Error("Erro ao buscar produtos.");
         }
 
-        // Converte a resposta para JavaScript.
+        // Converte a resposta da API para um objeto JavaScript.
         produtos = await resposta.json();
 
-        // Mostra os produtos na tela.
+        // Depois de carregar os produtos,
+        // mostramos eles na tela.
         mostrarProdutos();
 
     } catch (erro) {
 
+        // Mostra o erro no console do navegador.
         console.error(
             "Erro ao carregar produtos:",
             erro
         );
 
+        // Mostra uma mensagem para o usuário.
         document.getElementById(
             "lista-produtos"
         ).innerHTML = `
@@ -55,15 +58,18 @@ async function carregarProdutos() {
 
 
 // ============================================================
-// MOSTRAR PRODUTOS
+// MOSTRAR PRODUTOS NA TELA
 // ============================================================
 
 function mostrarProdutos() {
 
+    // Pega o elemento HTML onde os produtos serão exibidos.
     const lista = document.getElementById(
         "lista-produtos"
     );
 
+    // Se não houver produtos cadastrados,
+    // mostramos uma mensagem.
     if (produtos.length === 0) {
 
         lista.innerHTML = `
@@ -75,6 +81,7 @@ function mostrarProdutos() {
         return;
     }
 
+    // Percorre todos os produtos e cria o HTML de cada um.
     lista.innerHTML = produtos.map(produto => `
 
         <div class="product-card">
@@ -105,16 +112,17 @@ function mostrarProdutos() {
 
 
 // ============================================================
-// ADICIONAR AO CARRINHO
+// ADICIONAR PRODUTO AO CARRINHO
 // ============================================================
 
 function adicionarAoCarrinho(produtoId) {
 
-    // Procura o produto na lista que veio da API.
+    // Procura o produto na lista de produtos.
     const produto = produtos.find(
         produto => produto.id === produtoId
     );
 
+    // Se não encontrou o produto, interrompe.
     if (!produto) {
 
         console.error(
@@ -124,15 +132,18 @@ function adicionarAoCarrinho(produtoId) {
         return;
     }
 
-    // Verifica se o produto já está no carrinho.
+    // Verifica se esse produto já está no carrinho.
     const itemExistente = carrinho.find(
         item => item.produto_id === produtoId
     );
 
+    // ========================================================
+    // PRODUTO JÁ ESTÁ NO CARRINHO
+    // ========================================================
+
     if (itemExistente) {
 
-        // Não deixa colocar mais produtos
-        // do que existe no estoque.
+        // Verifica se já atingimos o limite do estoque.
         if (
             itemExistente.quantidade >=
             produto.estoque
@@ -145,23 +156,36 @@ function adicionarAoCarrinho(produtoId) {
             return;
         }
 
-        // Se já existe, aumenta a quantidade.
+        // Se ainda houver estoque,
+        // aumenta a quantidade em 1.
         itemExistente.quantidade++;
 
     } else {
 
-        // Se ainda não existe, adiciona ao carrinho.
+        // ====================================================
+        // PRODUTO AINDA NÃO ESTÁ NO CARRINHO
+        // ====================================================
+
         carrinho.push({
 
+            // IMPORTANTE:
+            // Guardamos o ID como produto_id porque
+            // é esse nome que a API espera.
             produto_id: produto.id,
-            nome: produto.nome,
-            preco: Number(produto.preco),
-            quantidade: 1
 
+            // Guardamos o nome para mostrar no carrinho.
+            nome: produto.nome,
+
+            // Guardamos o preço como número.
+            preco: Number(produto.preco),
+
+            // Quando adicionamos pela primeira vez,
+            // a quantidade começa em 1.
+            quantidade: 1
         });
     }
 
-    // Atualiza a tela.
+    // Atualiza o carrinho na tela.
     mostrarCarrinho();
 }
 
@@ -170,19 +194,14 @@ function adicionarAoCarrinho(produtoId) {
 // MOSTRAR CARRINHO
 // ============================================================
 
-// ============================================================
-// MOSTRAR CARRINHO
-// ============================================================
-
-// Desenha os produtos que estão atualmente
-// dentro do carrinho.
 function mostrarCarrinho() {
 
+    // Pega o elemento HTML do carrinho.
     const elementoCarrinho =
         document.getElementById("carrinho");
 
     // Se o carrinho estiver vazio,
-    // mostramos a mensagem padrão.
+    // mostramos uma mensagem.
     if (carrinho.length === 0) {
 
         elementoCarrinho.innerHTML = `
@@ -191,12 +210,13 @@ function mostrarCarrinho() {
             </p>
         `;
 
+        // Mesmo vazio, atualizamos o resumo.
         atualizarResumo();
 
         return;
     }
 
-    // Cria visualmente cada item do carrinho.
+    // Cria o HTML de todos os itens do carrinho.
     elementoCarrinho.innerHTML = carrinho.map(
         item => `
 
@@ -215,7 +235,6 @@ function mostrarCarrinho() {
 
             </div>
 
-
             <div>
 
                 <strong>
@@ -227,19 +246,16 @@ function mostrarCarrinho() {
 
                 <div>
 
-                    <!-- Diminui uma unidade -->
                     <button
                         onclick="diminuirQuantidade(${item.produto_id})"
                     >
                         −
                     </button>
 
-                    <!-- Mostra a quantidade atual -->
                     <span>
                         ${item.quantidade}
                     </span>
 
-                    <!-- Aumenta uma unidade -->
                     <button
                         onclick="aumentarQuantidade(${item.produto_id})"
                     >
@@ -248,7 +264,6 @@ function mostrarCarrinho() {
 
                 </div>
 
-                <!-- Remove o produto inteiro -->
                 <button
                     onclick="removerDoCarrinho(${item.produto_id})"
                 >
@@ -262,29 +277,28 @@ function mostrarCarrinho() {
     `
     ).join("");
 
-    // Atualiza subtotal, total e quantidade.
+    // Atualiza quantidade, subtotal e total.
     atualizarResumo();
 }
+
+
 // ============================================================
 // AUMENTAR QUANTIDADE
 // ============================================================
 
-// Aumenta em 1 a quantidade de um produto
-// que já está no carrinho.
 function aumentarQuantidade(produtoId) {
 
-    // Procura o produto no carrinho.
+    // Procura o item dentro do carrinho.
     const item = carrinho.find(
         item => item.produto_id === produtoId
     );
 
-    // Se não encontrou, não fazemos nada.
+    // Se não encontrou, não faz nada.
     if (!item) {
         return;
     }
 
-    // Procura o produto original para descobrir
-    // quanto existe disponível no estoque.
+    // Procura o produto original para verificar o estoque.
     const produto = produtos.find(
         produto => produto.id === produtoId
     );
@@ -293,7 +307,7 @@ function aumentarQuantidade(produtoId) {
         return;
     }
 
-    // Impede que o carrinho ultrapasse o estoque.
+    // Não permite vender mais do que existe no estoque.
     if (item.quantidade >= produto.estoque) {
 
         alert(
@@ -303,21 +317,21 @@ function aumentarQuantidade(produtoId) {
         return;
     }
 
-    // Aumenta uma unidade.
+    // Aumenta a quantidade.
     item.quantidade++;
 
-    // Atualiza a tela.
+    // Atualiza o carrinho.
     mostrarCarrinho();
 }
+
+
 // ============================================================
 // DIMINUIR QUANTIDADE
 // ============================================================
 
-// Diminui em 1 a quantidade de um produto
-// que está no carrinho.
 function diminuirQuantidade(produtoId) {
 
-    // Procura o produto no carrinho.
+    // Procura o item no carrinho.
     const item = carrinho.find(
         item => item.produto_id === produtoId
     );
@@ -326,8 +340,8 @@ function diminuirQuantidade(produtoId) {
         return;
     }
 
-    // Se tiver apenas 1 unidade,
-    // removemos o produto do carrinho.
+    // Se a quantidade for 1,
+    // ao diminuir devemos remover o produto.
     if (item.quantidade === 1) {
 
         removerDoCarrinho(produtoId);
@@ -335,8 +349,8 @@ function diminuirQuantidade(produtoId) {
         return;
     }
 
-    // Caso tenha mais de uma unidade,
-    // apenas diminuímos a quantidade.
+    // Caso tenha mais de 1 unidade,
+    // apenas diminui a quantidade.
     item.quantidade--;
 
     // Atualiza a tela.
@@ -345,35 +359,36 @@ function diminuirQuantidade(produtoId) {
 
 
 // ============================================================
-// REMOVER DO CARRINHO
+// REMOVER PRODUTO DO CARRINHO
 // ============================================================
 
 function removerDoCarrinho(produtoId) {
 
-    // Mantém todos os produtos,
-    // menos aquele que queremos remover.
+    // Cria um novo carrinho contendo
+    // somente os produtos diferentes do ID informado.
     carrinho = carrinho.filter(
         item => item.produto_id !== produtoId
     );
 
+    // Atualiza a tela.
     mostrarCarrinho();
 }
 
 
 // ============================================================
-// ATUALIZAR RESUMO
+// ATUALIZAR RESUMO DA VENDA
 // ============================================================
 
 function atualizarResumo() {
 
-    // Soma as quantidades.
+    // Soma a quantidade de todos os produtos.
     const quantidade = carrinho.reduce(
         (total, item) =>
             total + item.quantidade,
         0
     );
 
-    // Soma o valor da venda.
+    // Calcula o subtotal da venda.
     const subtotal = carrinho.reduce(
         (total, item) =>
             total +
@@ -381,16 +396,23 @@ function atualizarResumo() {
         0
     );
 
+    // Define se devemos escrever "item" ou "itens".
+    const textoItens =
+        quantidade === 1 ? "item" : "itens";
+
+    // Atualiza a quantidade exibida na tela.
     document.getElementById(
         "quantidade-itens"
     ).textContent =
-        `${quantidade} ${quantidade === 1 ? "item" : "itens"}`;
+        `${quantidade} ${textoItens}`;
 
+    // Atualiza o subtotal.
     document.getElementById(
         "subtotal"
     ).textContent =
         formatarMoeda(subtotal);
 
+    // Atualiza o total.
     document.getElementById(
         "total"
     ).textContent =
@@ -399,11 +421,14 @@ function atualizarResumo() {
 
 
 // ============================================================
-// FORMATAR MOEDA
+// FORMATAR VALORES EM REAL
 // ============================================================
 
 function formatarMoeda(valor) {
 
+    // Converte um número para o formato brasileiro.
+    // Exemplo:
+    // 10.5 -> R$ 10,50
     return valor.toLocaleString(
         "pt-BR",
         {
@@ -419,77 +444,191 @@ function formatarMoeda(valor) {
 // ============================================================
 
 async function finalizarVenda() {
-    // Verifica se existe algum produto no carrinho
+
+    // ========================================================
+    // 1. VERIFICAR SE O CARRINHO ESTÁ VAZIO
+    // ========================================================
+
     if (carrinho.length === 0) {
-        alert("O carrinho está vazio.");
+
+        alert(
+            "O carrinho está vazio."
+        );
+
         return;
     }
 
-    // Pega a forma de pagamento escolhida na tela
-    const formaPagamento = document.getElementById("forma-pagamento").value;
 
-    // Monta os dados exatamente no formato que a API espera
+    // ========================================================
+    // 2. PEGAR A FORMA DE PAGAMENTO
+    // ========================================================
+
+    const formaPagamento =
+        document.getElementById(
+            "forma-pagamento"
+        ).value;
+
+
+    // ========================================================
+    // 3. MONTAR O OBJETO DA VENDA
+    // ========================================================
+
     const venda = {
+
+        // Aqui transformamos o nosso carrinho
+        // no formato que o backend espera.
         itens: carrinho.map(item => ({
-            produto_id: item.id,
+
+            // IMPORTANTE:
+            // O carrinho possui "produto_id".
+            // Antes estávamos usando "item.id",
+            // mas essa propriedade não existe.
+            produto_id: item.produto_id,
+
             quantidade: item.quantidade
         })),
 
+        // Forma de pagamento escolhida.
         forma_pagamento: formaPagamento
     };
 
+
+    // Mostra no console exatamente o que será enviado.
+    // Isso ajuda bastante durante o desenvolvimento.
+    console.log(
+        "Venda que será enviada:",
+        venda
+    );
+
+
+    // ========================================================
+    // 4. ENVIAR A VENDA PARA A API
+    // ========================================================
+
     try {
-        // Envia a venda para o backend
-        const resposta = await fetch(`${API_URL}/vendas/`, {
-            method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        // Faz uma requisição POST para o endpoint de vendas.
+        const resposta = await fetch(
+            `${API_URL}/vendas/`,
+            {
+                method: "POST",
 
-            body: JSON.stringify(venda)
-        });
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        // Se a API retornar erro, mostramos a mensagem
+                // Converte o objeto JavaScript
+                // para JSON antes de enviar.
+                body: JSON.stringify(venda)
+            }
+        );
+
+
+        // ====================================================
+        // 5. VERIFICAR SE A API RETORNOU ERRO
+        // ====================================================
+
         if (!resposta.ok) {
+
+            // Tenta pegar os detalhes do erro
+            // enviados pelo FastAPI.
             const erro = await resposta.json();
 
-            alert(erro.detail || "Erro ao finalizar a venda.");
+            console.error(
+                "Erro retornado pela API:",
+                erro
+            );
+
+            alert(
+                erro.detail ||
+                "Erro ao finalizar a venda."
+            );
+
             return;
         }
 
-        // Converte a resposta da API para objeto JavaScript
-        const resultado = await resposta.json();
 
-        // Mostra confirmação para o usuário
+        // ====================================================
+        // 6. PEGAR A RESPOSTA DA API
+        // ====================================================
+
+        const resultado =
+            await resposta.json();
+
+
+        // ====================================================
+        // 7. MOSTRAR CONFIRMAÇÃO
+        // ====================================================
+
         alert(
             `Venda #${resultado.id} realizada com sucesso!\n` +
             `Total: ${formatarMoeda(resultado.total)}`
         );
 
-        // Limpa o carrinho depois da venda
+
+        // ====================================================
+        // 8. LIMPAR O CARRINHO
+        // ====================================================
+
         carrinho = [];
 
-        // Atualiza a tela
+
+        // Atualiza o carrinho na tela.
         mostrarCarrinho();
 
-        // Recarrega os produtos para atualizar o estoque exibido
+
+        // ====================================================
+        // 9. RECARREGAR OS PRODUTOS
+        // ====================================================
+
+        // Isso faz o estoque mostrado na tela
+        // ser atualizado depois da venda.
         carregarProdutos();
 
-    } catch (erro) {
-        // Erro de comunicação com a API
-        console.error("Erro ao finalizar venda:", erro);
 
-        alert("Não foi possível conectar com o sistema.");
+    } catch (erro) {
+
+        // ====================================================
+        // ERRO DE CONEXÃO COM A API
+        // ====================================================
+
+        console.error(
+            "Erro ao finalizar venda:",
+            erro
+        );
+
+        alert(
+            "Não foi possível conectar com o sistema."
+        );
     }
 }
 
+
 // ============================================================
-// INICIALIZAÇÃO
+// CONECTAR O BOTÃO "FINALIZAR VENDA"
 // ============================================================
 
-// Carrega os produtos apenas uma vez.
+// Pegamos o botão pelo ID definido no HTML.
+const botaoFinalizar =
+    document.getElementById(
+        "finalizar-venda"
+    );
+
+// Quando o usuário clicar no botão,
+// executamos a função finalizarVenda().
+botaoFinalizar.addEventListener(
+    "click",
+    finalizarVenda
+);
+
+
+// ============================================================
+// INICIALIZAÇÃO DO SISTEMA
+// ============================================================
+
+// Quando a página carregar,
+// buscamos os produtos na API.
 carregarProdutos();
 
-// Começa com o carrinho vazio.
+// Também iniciamos o carrinho vazio.
 mostrarCarrinho();

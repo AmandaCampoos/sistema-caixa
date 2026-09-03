@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -17,6 +18,7 @@
 
     <!-- Cabeçalho principal do sistema -->
     <header class="topbar">
+
         <div>
             <h1>Sistema Caixa</h1>
             <p>Controle de vendas e estoque</p>
@@ -26,16 +28,21 @@
             <span class="status-dot"></span>
             Sistema online
         </div>
+
     </header>
 
 
     <!-- Conteúdo principal -->
     <main class="container">
 
-        <!-- Área de produtos -->
+        <!-- =====================================================
+             ÁREA DE PRODUTOS
+        ====================================================== -->
+
         <section class="products-section">
 
             <div class="section-header">
+
                 <div>
                     <h2>Produtos</h2>
                     <p>Selecione um produto para adicionar à venda.</p>
@@ -47,11 +54,16 @@
                     id="busca"
                     placeholder="Buscar produto..."
                 >
+
             </div>
 
-            <!-- JavaScript vai colocar os produtos aqui -->
+
+            <!--
+                O JavaScript vai colocar os produtos
+                recebidos da API aqui dentro.
+            -->
             <div id="lista-produtos" class="products-grid">
-                
+
                 <p class="loading">
                     Carregando produtos...
                 </p>
@@ -61,16 +73,31 @@
         </section>
 
 
-        <!-- Carrinho -->
+        <!-- =====================================================
+             CARRINHO
+        ====================================================== -->
+
         <aside class="cart">
 
             <div class="cart-header">
+
                 <h2>Venda atual</h2>
-                <span id="quantidade-itens">0 itens</span>
+
+                <!--
+                    O JavaScript atualiza esse número
+                    conforme adicionamos produtos.
+                -->
+                <span id="quantidade-itens">
+                    0 itens
+                </span>
+
             </div>
 
 
-            <!-- Produtos adicionados ao carrinho -->
+            <!--
+                Produtos adicionados ao carrinho
+                serão mostrados aqui.
+            -->
             <div id="carrinho" class="cart-items">
 
                 <p class="empty-cart">
@@ -80,23 +107,44 @@
             </div>
 
 
-            <!-- Resumo da venda -->
+            <!-- =================================================
+                 RESUMO DA VENDA
+            ================================================== -->
+
             <div class="cart-summary">
 
                 <div class="summary-line">
-                    <span>Subtotal</span>
-                    <strong id="subtotal">R$ 0,00</strong>
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <strong id="subtotal">
+                        R$ 0,00
+                    </strong>
+
                 </div>
 
+
                 <div class="summary-line total">
-                    <span>Total</span>
-                    <strong id="total">R$ 0,00</strong>
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong id="total">
+                        R$ 0,00
+                    </strong>
+
                 </div>
 
             </div>
 
 
-            <!-- Forma de pagamento -->
+            <!-- =================================================
+                 FORMA DE PAGAMENTO
+            ================================================== -->
+
             <div class="payment">
 
                 <label for="forma-pagamento">
@@ -122,7 +170,10 @@
             </div>
 
 
-            <!-- Botão para finalizar -->
+            <!-- =================================================
+                 BOTÃO FINALIZAR VENDA
+            ================================================== -->
+
             <button
                 id="finalizar-venda"
                 class="btn-finalizar"
@@ -135,9 +186,16 @@
     </main>
 
 
-    <!-- Nosso JavaScript -->
+    <!--
+        Nosso arquivo JavaScript.
+
+        Ele precisa estar no final do body para que
+        os elementos HTML já tenham sido carregados
+        quando o JavaScript tentar encontrá-los.
+    -->
     <script src="script.js"></script>
 
 </body>
 
 </html>
+```
