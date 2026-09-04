@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Histórico de Vendas - Sistema Caixa</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Cabeçalho -->
+    <header class="topbar">
+
+        <div>
+            <h1>Sistema Caixa</h1>
+            <p>Histórico de vendas</p>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Sistema online
+        </div>
+
+    </header>
+
+
+    <!-- Conteúdo principal -->
+    <main class="container">
+
+        <section class="products-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>Histórico de vendas</h2>
+
+                    <p>
+                        Consulte as vendas realizadas no sistema.
+                    </p>
+                </div>
+
+                <!-- Voltar para o caixa -->
+                <a
+                    href="index.html"
+                    class="btn-finalizar"
+                >
+                    ← Voltar para o caixa
+                </a>
+
+            </div>
+
+
+            <!-- Tabela de vendas -->
+            <div class="sales-table-container">
+
+                <table class="sales-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Venda</th>
+                            <th>Data</th>
+                            <th>Total</th>
+                            <th>Pagamento</th>
+                            <th>Status</th>
+                            <th>Ação</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="lista-vendas">
+
+                        <tr>
+                            <td colspan="6">
+                                Carregando vendas...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Modal para visualizar detalhes -->
+    <div
+        id="modal-venda"
+        class="modal"
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Detalhes da venda
+                </h2>
+
+                <button
+                    type="button"
+                    class="modal-fechar"
+                    onclick="fecharDetalhes()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- Informações da venda -->
+            <div id="detalhes-venda">
+
+                Carregando...
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // URL da nossa API
+        const API_URL =
+            "http://127.0.0.1:8000";
+
+
+        // ================================================
+        // CARREGAR VENDAS
+        // ================================================
+
+        async function carregarVendas() {
+
+            const tabela =
+                document.getElementById("lista-vendas");
+
+            try {
+
+                const resposta =
+                    await fetch(
+                        `${API_URL}/vendas/`
+                    );
+
+
+                if (!resposta.ok) {
+
+                    throw new Error(
+                        "Erro ao buscar vendas."
+                    );
+                }
+
+
+                const vendas =
+                    await resposta.json();
+
+
+                // Se ainda não houver vendas
+                if (vendas.length === 0) {
+
+                    tabela.innerHTML = `
+                        <tr>
+                            <td colspan="6">
+                                Nenhuma venda realizada.
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+                }
+
+
+                // Monta as linhas da tabela
+                tabela.innerHTML =
+                    vendas.map(venda => `
+
+                        <tr>
+
+                            <td>
+                                #${venda.id}
+                            </td>
+
+                            <td>
+                                ${formatarData(venda.data)}
+                            </td>
+
+                            <td>
+                                ${formatarMoeda(venda.total)}
+                            </td>
+
+                            <td>
+                                ${formatarPagamento(
+                                    venda.forma_pagamento
+                                )}
+                            </td>
+
+                            <td>
+                                ${venda.status}
+                            </td>
+
+                            <td>
+
+                                <button
+                                    onclick="verDetalhes(${venda.id})"
+                                >
+                                    Ver detalhes
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    `).join("");
+
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro:",
+                    erro
+                );
+
+                tabela.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            Não foi possível carregar as vendas.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+
+        // ================================================
+        // VER DETALHES
+        // ================================================
+
+        async function verDetalhes(vendaId) {
+
+            const modal =
+                document.getElementById(
+                    "modal-venda"
+                );
+
+            const detalhes =
+                document.getElementById(
+                    "detalhes-venda"
+                );
+
+
+            modal.classList.add("ativo");
+
+
+            detalhes.innerHTML =
+                "Carregando detalhes...";
+
+
+            try {
+
+                const resposta =
+                    await fetch(
+                        `${API_URL}/vendas/${vendaId}`
+                    );
+
+
+                if (!resposta.ok) {
+
+                    throw new Error(
+                        "Erro ao buscar venda."
+                    );
+                }
+
+
+                const venda =
+                    await resposta.json();
+
+
+                detalhes.innerHTML = `
+
+                    <div class="sale-detail">
+
+                        <p>
+                            <strong>
+                                Venda:
+                            </strong>
+
+                            #${venda.id}
+                        </p>
+
+
+                        <p>
+                            <strong>
+                                Pagamento:
+                            </strong>
+
+                            ${formatarPagamento(
+                                venda.forma_pagamento
+                            )}
+                        </p>
+
+
+                        <p>
+                            <strong>
+                                Status:
+                            </strong>
+
+                            ${venda.status}
+                        </p>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <h3>
+                        Produtos
+                    </h3>
+
+
+                    ${venda.itens.map(item => `
+
+                        <div class="sale-detail-item">
+
+                            <span>
+                                ${item.quantidade}x
+                                Produto #${item.produto_id}
+                            </span>
+
+                            <strong>
+                                ${formatarMoeda(
+                                    item.subtotal
+                                )}
+                            </strong>
+
+                        </div>
+
+                    `).join("")}
+
+
+                    <hr>
+
+
+                    <div class="sale-detail-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            ${formatarMoeda(
+                                venda.total
+                            )}
+                        </strong>
+
+                    </div>
+
+                `;
+
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro:",
+                    erro
+                );
+
+                detalhes.innerHTML =
+                    "Não foi possível carregar os detalhes.";
+            }
+        }
+
+
+        // ================================================
+        // FECHAR DETALHES
+        // ================================================
+
+        function fecharDetalhes() {
+
+            document
+                .getElementById("modal-venda")
+                .classList.remove("ativo");
+        }
+
+
+        // ================================================
+        // FORMATAR MOEDA
+        // ================================================
+
+        function formatarMoeda(valor) {
+
+            return Number(valor).toLocaleString(
+                "pt-BR",
+                {
+                    style: "currency",
+                    currency: "BRL"
+                }
+            );
+        }
+
+
+        // ================================================
+        // FORMATAR DATA
+        // ================================================
+
+        function formatarData(data) {
+
+            if (!data) {
+                return "-";
+            }
+
+            return new Date(data).toLocaleString(
+                "pt-BR"
+            );
+        }
+
+
+        // ================================================
+        // FORMATAR PAGAMENTO
+        // ================================================
+
+        function formatarPagamento(pagamento) {
+
+            const formas = {
+
+                pix: "PIX",
+
+                dinheiro: "Dinheiro",
+
+                cartao: "Cartão"
+            };
+
+
+            return formas[pagamento]
+                || pagamento;
+        }
+
+
+        // Carrega as vendas quando a página abre
+        carregarVendas();
+
+    </script>
+
+</body>
+
+</html>
